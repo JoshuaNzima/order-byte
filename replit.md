@@ -1,8 +1,8 @@
-# OrderByte - Digital Menu System
+# OrderByte - Digital Menu & Ordering System
 
 ## Overview
 
-OrderByte is a QR code-based digital menu platform designed for hospitality establishments. The application allows restaurants and cafes to display their menus digitally through QR codes, providing customers with an interactive and responsive menu browsing experience. Built with Next.js and deployed on Cloudflare Workers, the system supports multiple organizations with customizable themes and menu structures.
+OrderByte is a complete QR code-based digital menu and ordering platform designed for hospitality establishments. The application allows restaurants and cafes to display their menus digitally through QR codes, enabling customers to browse menus and place orders directly from their tables without requiring accounts or app downloads. Built with Next.js and deployed on Cloudflare Workers, the system supports multiple organizations with customizable themes, full ordering capabilities, and comprehensive staff management.
 
 ## User Preferences
 
@@ -12,14 +12,18 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Architecture
 - **Framework**: Next.js 15 with React 19 using the App Router architecture
-- **Styling**: Tailwind CSS 4 with custom CSS variables for theming
+- **Styling**: Tailwind CSS 4 with custom CSS variables for theming and gradients
 - **TypeScript**: Full type safety with strict configuration
-- **Component Structure**: Modular component design with clear separation of concerns
+- **State Management**: React Context for cart management across components
+- **Component Structure**: Enhanced modular component design with animations and interactivity
   - `MenuPageWrapper`: Handles suspense boundaries and loading states
-  - `MenuPage`: Main menu display logic with URL parameter handling
-  - `MenuHeader`: Organization branding and contact information
+  - `MenuPage`: Main menu display logic with URL parameter handling and landing page
+  - `MenuHeader`: Enhanced organization branding with gradient text and contact icons
   - `MenuCategory`: Category grouping and item organization
-  - `MenuItem`: Individual menu item display with dietary indicators
+  - `MenuItem`: Interactive menu items with add-to-cart functionality and success animations
+  - `Cart`: Floating cart with full ordering capabilities
+  - `Button`: Reusable button component with multiple variants and loading states
+  - `Card`: Enhanced card component with hover effects and animations
 
 ### Deployment Architecture
 - **Platform**: Cloudflare Workers for serverless deployment
@@ -28,10 +32,12 @@ Preferred communication style: Simple, everyday language.
 - **Development**: Local development with hostname binding for Replit compatibility
 
 ### Data Architecture
-- **Data Source**: Static sample data structure (ready for database integration)
-- **Type System**: Comprehensive TypeScript interfaces for menu entities
+- **Data Source**: In-memory data storage with full CRUD operations
+- **Type System**: Comprehensive TypeScript interfaces for menu, order, and staff entities
 - **Organization Model**: Multi-tenant design supporting multiple restaurants
 - **Menu Structure**: Hierarchical category-based organization with item-level controls
+- **Order Management**: Complete order lifecycle from placement to delivery
+- **API Layer**: RESTful API endpoints for order management and staff operations
 
 ### Routing Strategy
 - **URL Parameters**: Organization identification through query parameters (`?org=organization-id`)
@@ -44,9 +50,10 @@ Preferred communication style: Simple, everyday language.
 - **Accessibility**: Proper contrast ratios and minimum touch target sizes
 
 ### State Management
-- **Approach**: Props-based data flow without external state management
-- **Loading States**: Suspense boundaries for better user experience
-- **Error Handling**: Graceful fallbacks for missing data
+- **Cart Management**: React Context with custom hooks for cart operations
+- **Loading States**: Suspense boundaries and loading animations throughout the app
+- **Error Handling**: Graceful fallbacks for missing data and API failures
+- **Real-time Updates**: Dynamic order status updates in staff dashboard
 
 ## External Dependencies
 
