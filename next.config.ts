@@ -2,14 +2,22 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Configuration for Replit environment
-  devIndicators: {
-    appIsrStatus: false,
-  },
-  // Ensure assets work in iframe environment
-  assetPrefix: process.env.NODE_ENV === 'production' ? undefined : '',
-  // Enable trust proxy for Replit
   experimental: {
     allowedRevalidateHeaderKeys: [],
+  },
+  // Allow cross-origin requests for Replit proxy environment
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+        ],
+      },
+    ]
   },
 };
 
