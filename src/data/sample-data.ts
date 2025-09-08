@@ -34,7 +34,7 @@ const bellaVistaItems: MenuItem[] = [
     id: 'margherita',
     name: 'Margherita Pizza',
     description: 'Fresh tomato sauce, mozzarella, basil, olive oil',
-    price: 16.99,
+    price: 27690, // ~$16.99 in MWK
     dietary: ['vegetarian'],
     available: true,
   },
@@ -42,15 +42,29 @@ const bellaVistaItems: MenuItem[] = [
     id: 'carbonara',
     name: 'Pasta Carbonara',
     description: 'Creamy pasta with pancetta, egg, and parmesan',
-    price: 18.99,
+    price: 30970, // ~$18.99 in MWK
     available: true,
   },
   {
     id: 'tiramisu',
     name: 'Tiramisu',
     description: 'Classic Italian dessert with coffee and mascarpone',
-    price: 8.99,
+    price: 14650, // ~$8.99 in MWK
     dietary: ['vegetarian'],
+    available: true,
+  },
+  {
+    id: 'nsima-beef',
+    name: 'Nsima with Beef Stew',
+    description: 'Traditional Malawian staple with tender beef in rich tomato sauce',
+    price: 22000,
+    available: true,
+  },
+  {
+    id: 'chambo-fish',
+    name: 'Grilled Chambo',
+    description: 'Fresh Lake Malawi chambo with local herbs and vegetables',
+    price: 35000,
     available: true,
   },
 ];
@@ -60,7 +74,7 @@ const urbanCafeItems: MenuItem[] = [
     id: 'avocado-toast',
     name: 'Avocado Toast',
     description: 'Sourdough bread with smashed avocado, lime, and sea salt',
-    price: 12.99,
+    price: 21170, // ~$12.99 in MWK
     dietary: ['vegan', 'dairy-free'],
     available: true,
   },
@@ -68,7 +82,7 @@ const urbanCafeItems: MenuItem[] = [
     id: 'cappuccino',
     name: 'Cappuccino',
     description: 'Rich espresso with steamed milk foam',
-    price: 4.99,
+    price: 8130, // ~$4.99 in MWK
     dietary: ['vegetarian'],
     available: true,
   },
@@ -76,8 +90,24 @@ const urbanCafeItems: MenuItem[] = [
     id: 'acai-bowl',
     name: 'Acai Bowl',
     description: 'Açaí with granola, berries, and coconut flakes',
-    price: 14.99,
+    price: 24440, // ~$14.99 in MWK
     dietary: ['vegan', 'gluten-free', 'dairy-free'],
+    available: true,
+  },
+  {
+    id: 'mandasi-coffee',
+    name: 'Mandasi & Coffee',
+    description: 'Traditional Malawian donuts with locally roasted coffee',
+    price: 6500,
+    dietary: ['vegetarian'],
+    available: true,
+  },
+  {
+    id: 'baobab-smoothie',
+    name: 'Baobab Smoothie',
+    description: 'Refreshing blend of baobab fruit, mango, and coconut water',
+    price: 12000,
+    dietary: ['vegan', 'dairy-free'],
     available: true,
   },
 ];

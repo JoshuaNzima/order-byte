@@ -14,7 +14,7 @@ export default function MenuItem({ item, accentColor }: MenuItemProps) {
   const [isAdding, setIsAdding] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const formatPrice = (price: number) => `$${price.toFixed(2)}`;
+  const formatPrice = (price: number) => `MK ${price.toLocaleString('en-MW')}`;
 
   const getDietaryBadgeColor = (dietary: string) => {
     switch (dietary) {
