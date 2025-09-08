@@ -32,30 +32,60 @@ export default function Cart({ accentColor, organizationName }: CartProps) {
     
     setIsPlacingOrder(true);
     
-    // Simulate order placement
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Here you would normally send the order to your backend
-    console.log('Order placed:', {
-      customer: customerName,
-      table: tableNumber,
-      items: cartItems,
-      total: getTotalPrice(),
-      restaurant: organizationName,
-      timestamp: new Date()
-    });
-    
-    setOrderPlaced(true);
-    setIsPlacingOrder(false);
-    
-    // Clear cart after 3 seconds
-    setTimeout(() => {
-      clearCart();
-      setOrderPlaced(false);
-      setCustomerName('');
-      setTableNumber('');
-      setIsOpen(false);
-    }, 3000);
+    try {
+      const orderData = {
+        organizationId: getOrganizationIdFromName(organizationName),
+        customerName: customerName.trim(),
+        tableNumber: tableNumber.trim(),
+        items: cartItems.map(cartItem => ({
+          itemId: cartItem.item.id,
+          name: cartItem.item.name,
+          price: cartItem.item.price,
+          quantity: cartItem.quantity,
+          notes: cartItem.notes
+        })),
+        totalAmount: getTotalPrice()
+      };
+
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setOrderPlaced(true);
+        setIsPlacingOrder(false);
+        
+        // Clear cart after 3 seconds
+        setTimeout(() => {
+          clearCart();
+          setOrderPlaced(false);
+          setCustomerName('');
+          setTableNumber('');
+          setIsOpen(false);
+        }, 3000);
+      } else {
+        throw new Error(result.error || 'Failed to place order');
+      }
+    } catch (error) {
+      console.error('Error placing order:', error);
+      setIsPlacingOrder(false);
+      // Here you could show an error message to the user
+    }
+  };
+
+  const getOrganizationIdFromName = (name: string) => {
+    // Simple mapping - in a real app, this would come from context or props
+    const orgMap: Record<string, string> = {
+      'Bella Vista Restaurant': 'bella-vista',
+      'Urban Café': 'urban-cafe'
+    };
+    return orgMap[name] || 'bella-vista';
   };
 
   if (!isOpen) {
