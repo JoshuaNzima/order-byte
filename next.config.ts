@@ -1,7 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Configuration for Replit environment
+  devIndicators: {
+    appIsrStatus: false,
+  },
+  // Ensure assets work in iframe environment
+  assetPrefix: process.env.NODE_ENV === 'production' ? undefined : '',
+  // Enable trust proxy for Replit
+  experimental: {
+    allowedRevalidateHeaderKeys: [],
+  },
 };
 
 export default nextConfig;
