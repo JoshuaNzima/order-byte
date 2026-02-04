@@ -1,7 +1,7 @@
 import { Order } from '@/types/staff';
 
 // In-memory storage for demo purposes
-export let orders: Order[] = [
+export const orders: Order[] = [
   {
     id: 'order-1',
     organizationId: 'bella-vista',

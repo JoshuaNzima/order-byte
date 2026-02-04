@@ -1,13 +1,14 @@
 'use client';
 
-import { useMemo } from 'react';
+import { use, useMemo } from 'react';
 import { useOrders } from '@/hooks/useOrders';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import OrderList from '@/components/dashboard/OrderList';
 
-export default function ChefDashboardPage({ params }: { params: { orgId: string } }) {
-  const { orders, loading, error, fetchOrders, updateOrderStatus } = useOrders(params.orgId);
+export default function ChefDashboardPage({ params }: { params: Promise<{ orgId: string }> }) {
+  const { orgId } = use(params);
+  const { orders, loading, error, fetchOrders, updateOrderStatus } = useOrders(orgId);
 
   const kitchenOrders = useMemo(() => {
     return orders.filter((o) => o.status === 'pending' || o.status === 'preparing');

@@ -1,4 +1,4 @@
-import { Organization, Menu, MenuCategory, MenuItem } from '@/types/menu';
+import { Organization, Menu, MenuItem } from '@/types/menu';
 
 export const organizations: Organization[] = [
   {

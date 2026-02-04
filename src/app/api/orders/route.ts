@@ -3,7 +3,19 @@ import { addOrder, getOrdersByOrganization } from '@/data/orders';
 
 export async function POST(request: NextRequest) {
   try {
-    const orderData: any = await request.json();
+    const orderData = (await request.json()) as {
+      organizationId: string;
+      customerName: string;
+      tableNumber: string;
+      items: Array<{
+        itemId: string;
+        name: string;
+        price: number;
+        quantity: number;
+        notes?: string;
+      }>;
+      totalAmount: number;
+    };
     
     const newOrder = addOrder({
       organizationId: orderData.organizationId,
@@ -15,7 +27,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true, order: newOrder });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { success: false, error: 'Failed to create order' },
       { status: 500 }
@@ -37,7 +49,7 @@ export async function GET(request: NextRequest) {
 
     const orders = getOrdersByOrganization(organizationId);
     return NextResponse.json({ success: true, orders });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { success: false, error: 'Failed to fetch orders' },
       { status: 500 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { use, useMemo } from 'react';
 import { useOrders } from '@/hooks/useOrders';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -8,9 +8,10 @@ import Card from '@/components/ui/Card';
 export default function AdminDashboardPage({
   params,
 }: {
-  params: { orgId: string };
+  params: Promise<{ orgId: string }>;
 }) {
-  const { orders, loading, error, fetchOrders } = useOrders(params.orgId);
+  const { orgId } = use(params);
+  const { orders, loading, error, fetchOrders } = useOrders(orgId);
 
   const stats = useMemo(() => {
     const total = orders.length;

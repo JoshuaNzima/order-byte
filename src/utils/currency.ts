@@ -14,7 +14,7 @@ export function convertToMWK(usdAmount: number): number {
 }
 
 // Convert all our current USD prices to MWK
-export function convertMenuItem(item: any) {
+export function convertMenuItem<T extends { price: number }>(item: T): T & { price: number } {
   return {
     ...item,
     price: convertToMWK(item.price)

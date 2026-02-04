@@ -1,13 +1,14 @@
 'use client';
 
-import { useMemo } from 'react';
+import { use, useMemo } from 'react';
 import { useOrders } from '@/hooks/useOrders';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import OrderList from '@/components/dashboard/OrderList';
 
-export default function ManagerDashboardPage({ params }: { params: { orgId: string } }) {
-  const { orders, loading, error, fetchOrders } = useOrders(params.orgId);
+export default function ManagerDashboardPage({ params }: { params: Promise<{ orgId: string }> }) {
+  const { orgId } = use(params);
+  const { orders, loading, error, fetchOrders } = useOrders(orgId);
 
   const activeOrders = useMemo(() => {
     return orders.filter((o) => o.status === 'pending' || o.status === 'preparing' || o.status === 'ready');

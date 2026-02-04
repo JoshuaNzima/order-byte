@@ -56,7 +56,7 @@ export default function Cart({ accentColor, organizationName }: CartProps) {
         body: JSON.stringify(orderData)
       });
 
-      const result = await response.json();
+      const result = (await response.json()) as { success: boolean; error?: string };
       
       if (result.success) {
         setOrderPlaced(true);
@@ -119,7 +119,7 @@ export default function Cart({ accentColor, organizationName }: CartProps) {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed!</h2>
-            <p className="text-gray-600">Your order has been sent to the kitchen. We'll prepare it shortly!</p>
+            <p className="text-gray-600">Your order has been sent to the kitchen. We&apos;ll prepare it shortly!</p>
           </div>
         </Card>
       </div>
