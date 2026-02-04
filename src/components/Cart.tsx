@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useCartContext } from '@/context/CartContext';
+import { formatMWK } from '@/utils/currency';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 
@@ -155,7 +156,7 @@ export default function Cart({ accentColor, organizationName }: CartProps) {
                   <div key={cartItem.item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex-1">
                       <h3 className="font-medium text-gray-900">{cartItem.item.name}</h3>
-                      <p className="text-sm text-gray-600">${cartItem.item.price.toFixed(2)} each</p>
+                      <p className="text-sm text-gray-600">{formatMWK(cartItem.item.price)} each</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <button
@@ -216,7 +217,7 @@ export default function Cart({ accentColor, organizationName }: CartProps) {
                 className="text-2xl font-bold"
                 style={{ color: accentColor }}
               >
-                ${getTotalPrice().toFixed(2)}
+                {formatMWK(getTotalPrice())}
               </span>
             </div>
             <Button

@@ -1,12 +1,33 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ChangeEvent, type ReactElement } from 'react';
 import { Order } from '@/types/staff';
 import { organizations } from '@/data/sample-data';
+import { formatMWK } from '@/utils/currency';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 
 export default function StaffDashboard() {
+  const statColors: Record<'yellow' | 'blue' | 'green' | 'gray', string> = {
+    yellow: 'text-yellow-600',
+    blue: 'text-blue-600',
+    green: 'text-green-600',
+    gray: 'text-gray-600'
+  };
+
+  type OrderDto = Omit<Order, 'createdAt' | 'updatedAt'> & {
+    createdAt: string;
+    updatedAt: string;
+  };
+
+  const deserializeOrder = (order: OrderDto): Order => {
+    return {
+      ...order,
+      createdAt: new Date(order.createdAt),
+      updatedAt: new Date(order.updatedAt)
+    };
+  };
+
   const [selectedOrg, setSelectedOrg] = useState('bella-vista');
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,9 +42,9 @@ export default function StaffDashboard() {
     setLoading(true);
     try {
       const response = await fetch(`/api/orders?organizationId=${selectedOrg}`);
-      const data = await response.json();
-      if (data.success) {
-        setOrders(data.orders);
+      const data = (await response.json()) as { success: boolean; orders?: OrderDto[] };
+      if (data.success && data.orders) {
+        setOrders(data.orders.map(deserializeOrder));
       }
     } catch (error) {
       console.error('Error fetching orders:', error);
@@ -40,7 +61,7 @@ export default function StaffDashboard() {
         body: JSON.stringify({ status })
       });
       
-      const data = await response.json();
+      const data = (await response.json()) as { success: boolean };
       if (data.success) {
         fetchOrders(); // Refresh orders
       }
@@ -61,58 +82,66 @@ export default function StaffDashboard() {
   };
 
   const getStatusActions = (order: Order) => {
-    const actions = [];
-    
+    const actions: Array<{ id: string; element: ReactElement }> = [];
+
     if (order.status === 'pending') {
-      actions.push(
-        <Button
-          key="accept"
-          size="sm"
-          onClick={() => updateOrderStatus(order.id, 'preparing')}
-          style={{ backgroundColor: organization?.theme.accentColor }}
-        >
-          Accept Order
-        </Button>
-      );
-      actions.push(
-        <Button
-          key="cancel"
-          variant="secondary"
-          size="sm"
-          onClick={() => updateOrderStatus(order.id, 'cancelled')}
-        >
-          Cancel
-        </Button>
-      );
+      actions.push({
+        id: 'accept',
+        element: (
+          <Button
+            size="sm"
+            onClick={() => updateOrderStatus(order.id, 'preparing')}
+            style={{ backgroundColor: organization?.theme.accentColor }}
+          >
+            Accept Order
+          </Button>
+        )
+      });
+      actions.push({
+        id: 'cancel',
+        element: (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => updateOrderStatus(order.id, 'cancelled')}
+          >
+            Cancel
+          </Button>
+        )
+      });
     }
-    
+
     if (order.status === 'preparing') {
-      actions.push(
-        <Button
-          key="ready"
-          size="sm"
-          onClick={() => updateOrderStatus(order.id, 'ready')}
-          style={{ backgroundColor: organization?.theme.accentColor }}
-        >
-          Mark Ready
-        </Button>
-      );
+      actions.push({
+        id: 'ready',
+        element: (
+          <Button
+            size="sm"
+            onClick={() => updateOrderStatus(order.id, 'ready')}
+            style={{ backgroundColor: organization?.theme.accentColor }}
+          >
+            Mark Ready
+          </Button>
+        )
+      });
     }
-    
+
     if (order.status === 'ready') {
-      actions.push(
-        <Button
-          key="delivered"
-          size="sm"
-          onClick={() => updateOrderStatus(order.id, 'delivered')}
-          style={{ backgroundColor: organization?.theme.accentColor }}
-        >
-          Mark Delivered
-        </Button>
-      );
+      actions.push({
+        id: 'delivered',
+        element: (
+          <Button
+            size="sm"
+            onClick={() => updateOrderStatus(order.id, 'delivered')}
+            style={{ backgroundColor: organization?.theme.accentColor }}
+          >
+            Mark Delivered
+          </Button>
+        )
+      });
     }
-    
-    return actions;
+
+    return actions.map(({ id, element }) => <span key={id}>{element}</span>);
   };
 
   if (!organization) return <div>Organization not found</div>;
@@ -131,7 +160,7 @@ export default function StaffDashboard() {
             <div className="flex items-center gap-4">
               <select
                 value={selectedOrg}
-                onChange={(e) => setSelectedOrg(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => setSelectedOrg(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 {organizations.map((org) => (
@@ -163,7 +192,7 @@ export default function StaffDashboard() {
             { label: 'Delivered', count: orders.filter(o => o.status === 'delivered').length, color: 'gray' }
           ].map((stat) => (
             <Card key={stat.label} className="p-6 text-center">
-              <div className={`text-3xl font-bold text-${stat.color}-600 mb-2`}>
+              <div className={`text-3xl font-bold ${statColors[stat.color as keyof typeof statColors]} mb-2`}>
                 {stat.count}
               </div>
               <div className="text-gray-600">{stat.label} Orders</div>
@@ -217,13 +246,13 @@ export default function StaffDashboard() {
                           {order.items.map((item, index) => (
                             <div key={index} className="flex justify-between text-sm">
                               <span>{item.quantity}x {item.name}</span>
-                              <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                              <span className="font-medium">{formatMWK(item.price * item.quantity)}</span>
                             </div>
                           ))}
                         </div>
                         <div className="border-t border-gray-200 mt-2 pt-2 flex justify-between font-semibold">
                           <span>Total:</span>
-                          <span>${order.totalAmount.toFixed(2)}</span>
+                          <span>{formatMWK(order.totalAmount)}</span>
                         </div>
                       </div>
                       

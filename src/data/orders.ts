@@ -11,17 +11,17 @@ export let orders: Order[] = [
       {
         itemId: 'margherita',
         name: 'Margherita Pizza',
-        price: 16.99,
+        price: 27690,
         quantity: 1
       },
       {
         itemId: 'carbonara',
         name: 'Pasta Carbonara',
-        price: 18.99,
+        price: 30970,
         quantity: 1
       }
     ],
-    totalAmount: 35.98,
+    totalAmount: 58660,
     status: 'preparing',
     createdAt: new Date(Date.now() - 15 * 60000), // 15 minutes ago
     updatedAt: new Date(Date.now() - 15 * 60000)
@@ -35,17 +35,17 @@ export let orders: Order[] = [
       {
         itemId: 'avocado-toast',
         name: 'Avocado Toast',
-        price: 12.99,
+        price: 21170,
         quantity: 2
       },
       {
         itemId: 'cappuccino',
         name: 'Cappuccino',
-        price: 4.99,
+        price: 8130,
         quantity: 1
       }
     ],
-    totalAmount: 30.97,
+    totalAmount: 50470,
     status: 'ready',
     createdAt: new Date(Date.now() - 8 * 60000), // 8 minutes ago
     updatedAt: new Date(Date.now() - 2 * 60000)
