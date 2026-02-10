@@ -21,7 +21,7 @@ function getTenantFromHost(host: string | null): string | null {
   return subdomain;
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const tenantId = getTenantFromHost(request.headers.get('host'));
 
   const requestHeaders = new Headers(request.headers);
