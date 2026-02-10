@@ -10,9 +10,10 @@ interface CartProps {
   accentColor: string;
   organizationId?: string;
   organizationName: string;
+  tableNumber?: string;
 }
 
-export default function Cart({ accentColor, organizationId, organizationName }: CartProps) {
+export default function Cart({ accentColor, organizationId, organizationName, tableNumber: initialTableNumber }: CartProps) {
   const { 
     cartItems, 
     updateQuantity, 
@@ -27,7 +28,7 @@ export default function Cart({ accentColor, organizationId, organizationName }: 
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [customerName, setCustomerName] = useState('');
-  const [tableNumber, setTableNumber] = useState('');
+  const [tableNumber, setTableNumber] = useState(initialTableNumber ?? '');
 
   const handlePlaceOrder = async () => {
     if (!customerName.trim() || !tableNumber.trim()) return;
