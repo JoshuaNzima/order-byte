@@ -28,10 +28,16 @@ export default function StaffLoginPage() {
 
       if (data.success && data.session) {
         // Redirect based on role
-        if (data.session.organizationId) {
-          router.push(`/staff?org=${data.session.organizationId}`);
+        const role = data.session.role;
+        const orgId = data.session.organizationId || organizationId;
+        
+        if (role === 'admin' || role === 'manager') {
+          router.push(orgId ? `/dashboard/${orgId}/admin` : '/dashboard/admin');
+        } else if (role === 'staff') {
+          // Default staff to waiter dashboard
+          router.push(orgId ? `/dashboard/${orgId}/waiter` : '/dashboard/waiter');
         } else {
-          router.push('/staff');
+          router.push('/dashboard');
         }
       } else {
         setError(data.error || 'Invalid credentials');
