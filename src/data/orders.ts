@@ -73,6 +73,8 @@ export function updateOrderStatus(orderId: string, status: Order['status']) {
   return null;
 }
 
-export function getOrdersByOrganization(organizationId: string) {
-  return orders.filter(order => order.organizationId === organizationId);
+export function getOrdersByOrganization(organizationId: string, customerSessionId?: string) {
+  const orgOrders = orders.filter(order => order.organizationId === organizationId);
+  if (!customerSessionId) return orgOrders;
+  return orgOrders.filter(order => order.customerSessionId === customerSessionId);
 }

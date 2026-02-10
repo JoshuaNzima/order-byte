@@ -1,6 +1,7 @@
 export interface Order {
   id: string;
   organizationId: string;
+  customerSessionId?: string;
   customerName: string;
   tableNumber: string;
   items: {

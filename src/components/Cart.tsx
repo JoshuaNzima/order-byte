@@ -8,10 +8,11 @@ import Card from '@/components/ui/Card';
 
 interface CartProps {
   accentColor: string;
+  organizationId?: string;
   organizationName: string;
 }
 
-export default function Cart({ accentColor, organizationName }: CartProps) {
+export default function Cart({ accentColor, organizationId, organizationName }: CartProps) {
   const { 
     cartItems, 
     updateQuantity, 
@@ -35,17 +36,13 @@ export default function Cart({ accentColor, organizationName }: CartProps) {
     
     try {
       const orderData = {
-        organizationId: getOrganizationIdFromName(organizationName),
         customerName: customerName.trim(),
         tableNumber: tableNumber.trim(),
         items: cartItems.map(cartItem => ({
           itemId: cartItem.item.id,
-          name: cartItem.item.name,
-          price: cartItem.item.price,
           quantity: cartItem.quantity,
           notes: cartItem.notes
-        })),
-        totalAmount: getTotalPrice()
+        }))
       };
 
       const response = await fetch('/api/orders', {
@@ -78,15 +75,6 @@ export default function Cart({ accentColor, organizationName }: CartProps) {
       setIsPlacingOrder(false);
       // Here you could show an error message to the user
     }
-  };
-
-  const getOrganizationIdFromName = (name: string) => {
-    // Simple mapping - in a real app, this would come from context or props
-    const orgMap: Record<string, string> = {
-      'Bella Vista Restaurant': 'bella-vista',
-      'Urban Café': 'urban-cafe'
-    };
-    return orgMap[name] || 'bella-vista';
   };
 
   if (!isOpen) {

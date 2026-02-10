@@ -14,10 +14,10 @@ function MenuPageFallback() {
   );
 }
 
-export default function MenuPageWrapper() {
+export default function MenuPageWrapper({ orgId }: { orgId?: string }) {
   return (
     <Suspense fallback={<MenuPageFallback />}>
-      <MenuPage />
+      <MenuPage orgId={orgId} />
     </Suspense>
   );
 }

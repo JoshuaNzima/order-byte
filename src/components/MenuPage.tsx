@@ -7,18 +7,18 @@ import MenuHeader from '@/components/MenuHeader';
 import MenuCategory from '@/components/MenuCategory';
 import Cart from '@/components/Cart';
 
-export default function MenuPage() {
+export default function MenuPage({ orgId }: { orgId?: string }) {
   const searchParams = useSearchParams();
-  const orgId = searchParams.get('org');
+  const resolvedOrgId = orgId ?? searchParams.get('org');
   
   // If no org parameter, show landing page
-  if (!orgId) {
+  if (!resolvedOrgId) {
     return <LandingPage />;
   }
 
   // Find the organization and menu
-  const organization = organizations.find(org => org.id === orgId);
-  const menu = menus.find(m => m.organizationId === orgId && m.isActive);
+  const organization = organizations.find(org => org.id === resolvedOrgId);
+  const menu = menus.find(m => m.organizationId === resolvedOrgId && m.isActive);
 
   if (!organization || !menu) {
     return (
@@ -75,6 +75,7 @@ export default function MenuPage() {
 
         <Cart 
           accentColor={organization.theme.accentColor}
+          organizationId={resolvedOrgId}
           organizationName={organization.name}
         />
       </div>
@@ -98,13 +99,13 @@ function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button 
-                onClick={() => window.location.href = '/?org=bella-vista'}
+                onClick={() => window.location.href = '/menu/bella-vista'}
                 className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
               >
                 Try Demo - Bella Vista
               </button>
               <button 
-                onClick={() => window.location.href = '/?org=urban-cafe'}
+                onClick={() => window.location.href = '/menu/urban-cafe'}
                 className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
               >
                 Try Demo - Urban Café
