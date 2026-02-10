@@ -1,19 +1,25 @@
 'use client';
 
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import type { OrganizationWithSettings } from '@/shared/types/superadmin';
 import { getSubdomainUrl } from '@/shared/utils/qr';
+import QRCodeDisplay from './QRCodeDisplay';
 
 interface OrganizationLandingPageProps {
   organization: OrganizationWithSettings;
 }
 
 export default function OrganizationLandingPage({ organization }: OrganizationLandingPageProps) {
-  const menuUrl = typeof window !== 'undefined' 
-    ? getSubdomainUrl(organization.id, window.location.origin)
-    : '';
+  const [menuUrl, setMenuUrl] = useState('');
 
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(menuUrl)}`;
+  useEffect(() => {
+    setMenuUrl(getSubdomainUrl(organization.id, window.location.origin));
+  }, [organization.id]);
+
+  if (!menuUrl) {
+    return null; // or a loading state
+  }
 
   return (
     <div 
@@ -70,14 +76,12 @@ export default function OrganizationLandingPage({ organization }: OrganizationLa
             
             {/* QR Code */}
             <div className="flex justify-center mb-8">
-              <div className="bg-white p-6 rounded-2xl shadow-xl">
-                <img 
-                  src={qrCodeUrl} 
-                  alt={`${organization.name} Menu QR Code`}
-                  className="w-64 h-64"
-                />
-                <p className="text-sm text-gray-500 mt-4">Scan to view menu</p>
-              </div>
+              <QRCodeDisplay 
+                url={menuUrl}
+                size={256}
+                orgName={organization.name}
+                primaryColor={organization.theme.primaryColor}
+              />
             </div>
 
             {/* Menu Link Button */}
