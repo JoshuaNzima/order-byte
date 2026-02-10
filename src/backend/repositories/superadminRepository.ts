@@ -2,8 +2,14 @@ import { organizations as seedOrgs, menus as seedMenus } from '@/backend/data/se
 import type { Organization, Menu, MenuItem } from '@/shared/types/menu';
 import type { OrganizationSettings, OrganizationWithSettings, AuditLog } from '@/shared/types/superadmin';
 
-// Extended organizations with settings
-const organizationsWithSettings: OrganizationWithSettings[] = seedOrgs.map((org) => ({
+// Use globalThis to persist data across hot reloads in development
+const globalStore = globalThis as unknown as {
+  __organizationsWithSettings?: OrganizationWithSettings[];
+  __auditLogs?: AuditLog[];
+};
+
+// Initialize or restore organizations with settings
+const organizationsWithSettings: OrganizationWithSettings[] = globalStore.__organizationsWithSettings || seedOrgs.map((org) => ({
   ...org,
   settings: {
     currency: 'MWK' as const,
@@ -19,7 +25,16 @@ const organizationsWithSettings: OrganizationWithSettings[] = seedOrgs.map((org)
   updatedAt: new Date(),
 }));
 
-const auditLogs: AuditLog[] = [];
+// Save to global store
+if (!globalStore.__organizationsWithSettings) {
+  globalStore.__organizationsWithSettings = organizationsWithSettings;
+}
+
+// Initialize or restore audit logs
+const auditLogs: AuditLog[] = globalStore.__auditLogs || [];
+if (!globalStore.__auditLogs) {
+  globalStore.__auditLogs = auditLogs;
+}
 
 export class OrganizationRepository {
   static getAll(): OrganizationWithSettings[] {
