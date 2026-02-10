@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useCart } from './useCart';
-import type { MenuItem } from '@/types/menu';
+import type { MenuItem } from '@/shared/types/menu';
 
 describe('useCart', () => {
   const item: MenuItem = {

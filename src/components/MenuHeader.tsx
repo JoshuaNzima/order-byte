@@ -1,4 +1,4 @@
-import { Organization } from '@/types/menu';
+import { Organization } from '@/shared/types/menu';
 
 interface MenuHeaderProps {
   organization: Organization;

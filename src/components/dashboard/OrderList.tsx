@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import type { Order } from '@/types/staff';
+import type { Order } from '@/shared/types/order';
 import { formatMWK } from '@/utils/currency';
 import Card from '@/components/ui/Card';
 

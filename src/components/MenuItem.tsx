@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MenuItem as MenuItemType } from '@/types/menu';
+import { MenuItem as MenuItemType } from '@/shared/types/menu';
 import { useCartContext } from '@/context/CartContext';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';

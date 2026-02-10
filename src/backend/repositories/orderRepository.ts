@@ -1,6 +1,5 @@
 import type { Order } from '@/shared/types/order';
 
-// In-memory storage for demo purposes
 export const orders: Order[] = [
   {
     id: 'order-1',
@@ -23,7 +22,7 @@ export const orders: Order[] = [
     ],
     totalAmount: 58660,
     status: 'preparing',
-    createdAt: new Date(Date.now() - 15 * 60000), // 15 minutes ago
+    createdAt: new Date(Date.now() - 15 * 60000),
     updatedAt: new Date(Date.now() - 15 * 60000)
   },
   {
@@ -47,7 +46,7 @@ export const orders: Order[] = [
     ],
     totalAmount: 50470,
     status: 'ready',
-    createdAt: new Date(Date.now() - 8 * 60000), // 8 minutes ago
+    createdAt: new Date(Date.now() - 8 * 60000),
     updatedAt: new Date(Date.now() - 2 * 60000)
   }
 ];

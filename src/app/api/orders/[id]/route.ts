@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { updateOrderStatus } from '@/data/orders';
-import type { Order } from '@/types/staff';
+import { updateOrderStatus } from '@/backend/repositories/orderRepository';
+import type { Order } from '@/shared/types/order';
 
 export async function PATCH(
   request: NextRequest,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { addOrder, getOrdersByOrganization } from '@/data/orders';
-import { organizations, menus } from '@/data/sample-data';
+import { addOrder, getOrdersByOrganization } from '@/backend/repositories/orderRepository';
+import { organizations, menus } from '@/backend/data/seed-data';
 
 function getTenantId(request: NextRequest): string | null {
   return request.headers.get('x-tenant-id');

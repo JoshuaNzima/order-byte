@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { MenuItem } from '@/types/menu';
+import type { MenuItem } from '@/shared/types/menu';
 
 export interface CartItem {
   item: MenuItem;

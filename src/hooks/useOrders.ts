@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { Order } from '@/types/staff';
+import type { Order } from '@/shared/types/order';
 
 type OrderDto = Omit<Order, 'createdAt' | 'updatedAt'> & {
   createdAt: string;

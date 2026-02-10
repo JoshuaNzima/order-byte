@@ -1,4 +1,4 @@
-import { Organization, Menu, MenuItem } from '@/shared/types/menu';
+import type { Organization, Menu, MenuItem } from '@/shared/types/menu';
 
 export const organizations: Organization[] = [
   {
@@ -34,7 +34,7 @@ const bellaVistaItems: MenuItem[] = [
     id: 'margherita',
     name: 'Margherita Pizza',
     description: 'Fresh tomato sauce, mozzarella, basil, olive oil',
-    price: 27690, // ~$16.99 in MWK
+    price: 27690,
     dietary: ['vegetarian'],
     available: true,
   },
@@ -42,14 +42,14 @@ const bellaVistaItems: MenuItem[] = [
     id: 'carbonara',
     name: 'Pasta Carbonara',
     description: 'Creamy pasta with pancetta, egg, and parmesan',
-    price: 30970, // ~$18.99 in MWK
+    price: 30970,
     available: true,
   },
   {
     id: 'tiramisu',
     name: 'Tiramisu',
     description: 'Classic Italian dessert with coffee and mascarpone',
-    price: 14650, // ~$8.99 in MWK
+    price: 14650,
     dietary: ['vegetarian'],
     available: true,
   },
@@ -74,7 +74,7 @@ const urbanCafeItems: MenuItem[] = [
     id: 'avocado-toast',
     name: 'Avocado Toast',
     description: 'Sourdough bread with smashed avocado, lime, and sea salt',
-    price: 21170, // ~$12.99 in MWK
+    price: 21170,
     dietary: ['vegan', 'dairy-free'],
     available: true,
   },
@@ -82,7 +82,7 @@ const urbanCafeItems: MenuItem[] = [
     id: 'cappuccino',
     name: 'Cappuccino',
     description: 'Rich espresso with steamed milk foam',
-    price: 8130, // ~$4.99 in MWK
+    price: 8130,
     dietary: ['vegetarian'],
     available: true,
   },
@@ -90,7 +90,7 @@ const urbanCafeItems: MenuItem[] = [
     id: 'acai-bowl',
     name: 'Acai Bowl',
     description: 'Açaí with granola, berries, and coconut flakes',
-    price: 24440, // ~$14.99 in MWK
+    price: 24440,
     dietary: ['vegan', 'gluten-free', 'dairy-free'],
     available: true,
   },

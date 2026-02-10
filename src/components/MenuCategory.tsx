@@ -1,4 +1,4 @@
-import { MenuCategory as MenuCategoryType } from '@/types/menu';
+import { MenuCategory as MenuCategoryType } from '@/shared/types/menu';
 import MenuItem from './MenuItem';
 
 interface MenuCategoryProps {
