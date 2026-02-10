@@ -24,6 +24,11 @@ export default function SuperAdminLayout({
       icon: '🏢',
     },
     {
+      label: 'Audit Logs',
+      href: '/superadmin/audit-logs',
+      icon: '📋',
+    },
+    {
       label: 'Settings',
       href: '/superadmin/settings',
       icon: '⚙️',
