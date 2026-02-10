@@ -219,13 +219,14 @@ export default function OrganizationsPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Settings</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Landing Page</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filteredOrgs.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
                     {searchQuery ? 'No organizations match your search.' : 'No organizations found. Create your first one!'}
                   </td>
                 </tr>
@@ -272,8 +273,8 @@ export default function OrganizationsPage() {
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {new Date(org.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
                         <Link
                           href={`/superadmin/organizations/${org.id}`}
                           className="text-blue-600 hover:text-blue-800 font-medium text-sm px-2 py-1 hover:bg-blue-50 rounded"
@@ -287,6 +288,18 @@ export default function OrganizationsPage() {
                           Delete
                         </button>
                       </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <Link
+                        href={`/org/${org.id}`}
+                        target="_blank"
+                        className="text-purple-600 hover:text-purple-800 font-medium text-sm px-2 py-1 hover:bg-purple-50 rounded flex items-center gap-1"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        View
+                      </Link>
                     </td>
                   </tr>
                 ))
