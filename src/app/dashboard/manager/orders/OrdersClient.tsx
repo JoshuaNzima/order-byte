@@ -14,11 +14,12 @@ interface Session {
   organizationId?: string;
 }
 
-export default function ManagerDashboardClient({ tenantId }: { tenantId: string }) {
+export default function OrdersClient({ tenantId }: { tenantId: string }) {
   const router = useRouter();
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-  const { orders, loading: ordersLoading, error, fetchOrders } = useOrders(tenantId);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [filter, setFilter] = useState<string>('all');
+  const { orders, loading, error, fetchOrders, updateOrderStatus } = useOrders(tenantId);
 
   useEffect(() => {
     checkAuth();
@@ -38,7 +39,7 @@ export default function ManagerDashboardClient({ tenantId }: { tenantId: string 
     } catch {
       router.push('/login/staff');
     } finally {
-      setLoading(false);
+      setAuthLoading(false);
     }
   };
 
@@ -47,23 +48,24 @@ export default function ManagerDashboardClient({ tenantId }: { tenantId: string 
     router.push('/login/staff');
   };
 
-  const activeOrders = orders.filter((o) => o.status === 'pending' || o.status === 'preparing' || o.status === 'ready');
-  const todayRevenue = orders
-    .filter((o) => o.status === 'delivered' && new Date(o.createdAt).toDateString() === new Date().toDateString())
-    .reduce((sum, o) => sum + o.totalAmount, 0);
-  const avgOrderTime = 15; // Mock average order time in minutes
+  const handleStatusUpdate = async (orderId: string, newStatus: string) => {
+    await updateOrderStatus(orderId, newStatus as any);
+  };
+
+  const filteredOrders = orders.filter((order) => {
+    if (filter === 'all') return true;
+    return order.status === filter;
+  });
 
   const stats = {
-    active: activeOrders.length,
+    total: orders.length,
     pending: orders.filter((o) => o.status === 'pending').length,
     preparing: orders.filter((o) => o.status === 'preparing').length,
     ready: orders.filter((o) => o.status === 'ready').length,
     delivered: orders.filter((o) => o.status === 'delivered').length,
-    todayRevenue,
-    avgOrderTime,
   };
 
-  if (loading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -101,8 +103,8 @@ export default function ManagerDashboardClient({ tenantId }: { tenantId: string 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-8">
           <aside className="space-y-2">
-            <NavLink href="/dashboard/manager" label="Overview" icon="dashboard" active />
-            <NavLink href="/dashboard/manager/orders" label="Live Orders" icon="orders" />
+            <NavLink href="/dashboard/manager" label="Overview" icon="dashboard" />
+            <NavLink href="/dashboard/manager/orders" label="Live Orders" icon="orders" active />
             <NavLink href="/dashboard/manager/staff" label="Staff Status" icon="staff" />
             <NavLink href="/dashboard/manager/analytics" label="Analytics" icon="analytics" />
           </aside>
@@ -110,12 +112,20 @@ export default function ManagerDashboardClient({ tenantId }: { tenantId: string 
           <main className="space-y-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Operations Overview</h2>
-                <p className="text-gray-600 mt-1">Real-time service metrics</p>
+                <h2 className="text-2xl font-bold text-gray-900">Live Orders</h2>
+                <p className="text-gray-600 mt-1">Manage all orders in real-time</p>
               </div>
-              <Button onClick={fetchOrders} size="sm" isLoading={ordersLoading}>
+              <Button onClick={fetchOrders} size="sm" isLoading={loading}>
                 Refresh
               </Button>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+              <FilterButton active={filter === 'all'} count={stats.total} label="All" onClick={() => setFilter('all')} />
+              <FilterButton active={filter === 'pending'} count={stats.pending} label="Pending" onClick={() => setFilter('pending')} color="yellow" />
+              <FilterButton active={filter === 'preparing'} count={stats.preparing} label="Preparing" onClick={() => setFilter('preparing')} color="orange" />
+              <FilterButton active={filter === 'ready'} count={stats.ready} label="Ready" onClick={() => setFilter('ready')} color="green" />
+              <FilterButton active={filter === 'delivered'} count={stats.delivered} label="Delivered" onClick={() => setFilter('delivered')} color="gray" />
             </div>
 
             {error ? (
@@ -124,63 +134,71 @@ export default function ManagerDashboardClient({ tenantId }: { tenantId: string 
               </Card>
             ) : null}
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <StatCard label="Active Orders" value={stats.active} color="blue" />
-              <StatCard label="Pending" value={stats.pending} color="yellow" />
-              <StatCard label="Preparing" value={stats.preparing} color="orange" />
-              <StatCard label="Ready" value={stats.ready} color="green" />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-                <div className="text-3xl font-bold text-green-700">${stats.todayRevenue.toFixed(2)}</div>
-                <div className="text-sm text-green-600 mt-1">Today's Revenue</div>
-              </Card>
-              <Card className="p-6 bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
-                <div className="text-3xl font-bold text-blue-700">{stats.delivered}</div>
-                <div className="text-sm text-blue-600 mt-1">Orders Completed</div>
-              </Card>
-              <Card className="p-6 bg-gradient-to-br from-purple-50 to-violet-50 border-purple-200">
-                <div className="text-3xl font-bold text-purple-700">{stats.avgOrderTime}m</div>
-                <div className="text-sm text-purple-600 mt-1">Avg. Order Time</div>
-              </Card>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Active Orders Queue</h3>
-                  <Link href="/dashboard/manager/orders" className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                    View All →
-                  </Link>
-                </div>
-                {activeOrders.length === 0 ? (
-                  <p className="text-gray-500">No active orders</p>
-                ) : (
-                  <div className="space-y-3">
-                    {activeOrders.slice(0, 5).map((order) => (
-                      <div key={order.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                        <div>
-                          <p className="font-medium text-gray-900">Table {order.tableNumber} - {order.customerName}</p>
-                          <p className="text-sm text-gray-500">{order.items.length} items • ${order.totalAmount.toFixed(2)}</p>
+            <div className="space-y-4">
+              {filteredOrders.length === 0 ? (
+                <Card className="p-8 text-center">
+                  <p className="text-gray-500">No orders found</p>
+                </Card>
+              ) : (
+                filteredOrders.map((order) => (
+                  <Card key={order.id} className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <div className="flex items-center gap-3">
+                          <h3 className="text-lg font-semibold text-gray-900">Table {order.tableNumber}</h3>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                            {order.status}
+                          </span>
                         </div>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                          {order.status}
-                        </span>
+                        <p className="text-sm text-gray-500 mt-1">
+                          {order.customerName} • {new Date(order.createdAt).toLocaleTimeString()}
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </Card>
+                      <div className="text-right">
+                        <p className="text-lg font-semibold text-gray-900">${order.totalAmount.toFixed(2)}</p>
+                        <p className="text-sm text-gray-500">{order.items.length} items</p>
+                      </div>
+                    </div>
 
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-                <div className="grid grid-cols-1 gap-3">
-                  <QuickAction href="/dashboard/manager/orders" label="Manage Orders" description="View and update order statuses" />
-                  <QuickAction href="/dashboard/manager/staff" label="Staff Status" description="Check staff availability and roles" />
-                  <QuickAction href="/dashboard/manager/analytics" label="View Analytics" description="See performance metrics" />
-                </div>
-              </Card>
+                    <div className="border-t border-gray-100 pt-4 mt-4">
+                      <div className="space-y-2">
+                        {order.items.map((item, idx) => (
+                          <div key={idx} className="flex items-center justify-between text-sm">
+                            <span className="text-gray-700">{item.quantity}x {item.name}</span>
+                            <span className="text-gray-500">${(item.price * item.quantity).toFixed(2)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
+                      {order.status === 'pending' && (
+                        <Button size="sm" onClick={() => handleStatusUpdate(order.id, 'preparing')}>
+                          Start Preparing
+                        </Button>
+                      )}
+                      {order.status === 'preparing' && (
+                        <Button size="sm" onClick={() => handleStatusUpdate(order.id, 'ready')}>
+                          Mark Ready
+                        </Button>
+                      )}
+                      {order.status === 'ready' && (
+                        <Button size="sm" onClick={() => handleStatusUpdate(order.id, 'delivered')}>
+                          Mark Delivered
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleStatusUpdate(order.id, 'cancelled')}
+                        disabled={order.status === 'cancelled' || order.status === 'delivered'}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </Card>
+                ))
+              )}
             </div>
           </main>
         </div>
@@ -212,19 +230,22 @@ function NavLink({ href, label, icon, active }: { href: string; label: string; i
   );
 }
 
-function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
+function FilterButton({ active, count, label, onClick, color = 'gray' }: { active: boolean; count: number; label: string; onClick: () => void; color?: string }) {
   const colors: Record<string, string> = {
-    blue: 'bg-blue-50 border-blue-200 text-blue-900',
-    yellow: 'bg-yellow-50 border-yellow-200 text-yellow-900',
-    orange: 'bg-orange-50 border-orange-200 text-orange-900',
-    green: 'bg-green-50 border-green-200 text-green-900',
+    gray: active ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+    yellow: active ? 'bg-yellow-500 text-white' : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200',
+    orange: active ? 'bg-orange-500 text-white' : 'bg-orange-100 text-orange-700 hover:bg-orange-200',
+    green: active ? 'bg-green-500 text-white' : 'bg-green-100 text-green-700 hover:bg-green-200',
   };
 
   return (
-    <Card className={`p-4 text-center ${colors[color]}`}>
-      <div className="text-2xl font-bold">{value}</div>
-      <div className="text-sm mt-1 opacity-80">{label}</div>
-    </Card>
+    <button
+      onClick={onClick}
+      className={`p-3 rounded-lg text-sm font-medium transition-colors ${colors[color]}`}
+    >
+      <div className="text-2xl font-bold">{count}</div>
+      <div className="text-xs mt-1 opacity-90">{label}</div>
+    </button>
   );
 }
 
@@ -237,21 +258,4 @@ function getStatusColor(status: string): string {
     cancelled: 'bg-red-100 text-red-800',
   };
   return colors[status] || 'bg-gray-100 text-gray-800';
-}
-
-function QuickAction({ href, label, description }: { href: string; label: string; description: string }) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-green-300 hover:bg-green-50 transition-colors"
-    >
-      <div>
-        <p className="font-medium text-gray-900">{label}</p>
-        <p className="text-sm text-gray-500">{description}</p>
-      </div>
-      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-      </svg>
-    </Link>
-  );
 }
