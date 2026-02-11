@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useOrders } from '@/hooks/useOrders';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
+import OrderList from '@/components/dashboard/OrderList';
 
 interface Session {
   userId: string;
@@ -14,11 +15,12 @@ interface Session {
   organizationId?: string;
 }
 
-export default function AdminDashboardClient({ tenantId }: { tenantId: string }) {
+export default function OrdersPage({ tenantId }: { tenantId: string }) {
   const router = useRouter();
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const { orders, loading: ordersLoading, error, fetchOrders } = useOrders(tenantId);
+  const [filter, setFilter] = useState<string>('all');
+  const { orders, loading: ordersLoading, error, fetchOrders, updateOrderStatus } = useOrders(tenantId);
 
   useEffect(() => {
     checkAuth();
@@ -47,16 +49,7 @@ export default function AdminDashboardClient({ tenantId }: { tenantId: string })
     router.push('/login/staff');
   };
 
-  const stats = {
-    total: orders.length,
-    pending: orders.filter((o) => o.status === 'pending').length,
-    preparing: orders.filter((o) => o.status === 'preparing').length,
-    ready: orders.filter((o) => o.status === 'ready').length,
-    delivered: orders.filter((o) => o.status === 'delivered').length,
-    cancelled: orders.filter((o) => o.status === 'cancelled').length,
-  };
-
-  const recentOrders = orders.slice(0, 5);
+  const filteredOrders = filter === 'all' ? orders : orders.filter((o) => o.status === filter);
 
   if (loading) {
     return (
@@ -96,18 +89,18 @@ export default function AdminDashboardClient({ tenantId }: { tenantId: string })
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-8">
           <aside className="space-y-2">
-            <NavLink href="/dashboard/admin" label="Overview" icon="dashboard" active />
-            <NavLink href="/dashboard/admin/orders" label="Orders" icon="orders" />
+            <NavLink href="/dashboard/admin" label="Overview" icon="dashboard" />
+            <NavLink href="/dashboard/admin/orders" label="Orders" icon="orders" active />
             <NavLink href="/dashboard/admin/menu" label="Menu" icon="menu" />
             <NavLink href="/dashboard/admin/staff" label="Staff" icon="staff" />
             <NavLink href="/dashboard/admin/settings" label="Settings" icon="settings" />
           </aside>
 
           <main className="space-y-6">
-            <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start justify-between gap-4 flex-wrap">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Overview</h2>
-                <p className="text-gray-600 mt-1">High-level operational metrics</p>
+                <h2 className="text-2xl font-bold text-gray-900">Order Management</h2>
+                <p className="text-gray-600 mt-1">View and manage all orders</p>
               </div>
               <Button onClick={fetchOrders} size="sm" isLoading={ordersLoading}>
                 Refresh
@@ -120,51 +113,62 @@ export default function AdminDashboardClient({ tenantId }: { tenantId: string })
               </Card>
             ) : null}
 
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              <StatCard label="Total" value={stats.total} color="blue" />
-              <StatCard label="Pending" value={stats.pending} color="yellow" />
-              <StatCard label="Preparing" value={stats.preparing} color="orange" />
-              <StatCard label="Ready" value={stats.ready} color="green" />
-              <StatCard label="Delivered" value={stats.delivered} color="gray" />
-              <StatCard label="Cancelled" value={stats.cancelled} color="red" />
+            {/* Filter Tabs */}
+            <div className="flex flex-wrap gap-2">
+              {['all', 'pending', 'preparing', 'ready', 'delivered', 'cancelled'].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setFilter(status)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    filter === status
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                  {status !== 'all' && (
+                    <span className="ml-2 px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs">
+                      {orders.filter((o) => o.status === status).length}
+                    </span>
+                  )}
+                </button>
+              ))}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Recent Orders</h3>
-                  <Link href="/dashboard/admin/orders" className="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                    View All →
-                  </Link>
-                </div>
-                {recentOrders.length === 0 ? (
-                  <p className="text-gray-500">No orders yet</p>
-                ) : (
-                  <div className="space-y-3">
-                    {recentOrders.map((order) => (
-                      <div key={order.id} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                        <div>
-                          <p className="font-medium text-gray-900">{order.customerName}</p>
-                          <p className="text-sm text-gray-500">{order.items.length} items • ${order.totalAmount.toFixed(2)}</p>
-                        </div>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                          {order.status}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </Card>
-
-              <Card className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-                <div className="grid grid-cols-1 gap-3">
-                  <QuickAction href="/dashboard/admin/menu" label="Manage Menu" description="Add or edit menu items" />
-                  <QuickAction href="/dashboard/admin/staff" label="Manage Staff" description="Add or manage staff members" />
-                  <QuickAction href="/dashboard/admin/settings" label="Settings" description="Configure organization settings" />
-                </div>
-              </Card>
-            </div>
+            <OrderList
+              title={`${filter === 'all' ? 'All' : filter.charAt(0).toUpperCase() + filter.slice(1)} Orders (${filteredOrders.length})`}
+              orders={filteredOrders}
+              emptyLabel="No orders found"
+              actions={(order) => (
+                <>
+                  {order.status === 'pending' && (
+                    <Button size="sm" onClick={() => updateOrderStatus(order.id, 'preparing')}>
+                      Start Preparing
+                    </Button>
+                  )}
+                  {order.status === 'preparing' && (
+                    <Button size="sm" onClick={() => updateOrderStatus(order.id, 'ready')}>
+                      Mark Ready
+                    </Button>
+                  )}
+                  {order.status === 'ready' && (
+                    <Button size="sm" onClick={() => updateOrderStatus(order.id, 'delivered')}>
+                      Mark Delivered
+                    </Button>
+                  )}
+                  {(order.status === 'pending' || order.status === 'preparing') && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => updateOrderStatus(order.id, 'cancelled')}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      Cancel
+                    </Button>
+                  )}
+                </>
+              )}
+            />
           </main>
         </div>
       </div>
@@ -192,52 +196,6 @@ function NavLink({ href, label, icon, active }: { href: string; label: string; i
     >
       {icons[icon]}
       {label}
-    </Link>
-  );
-}
-
-function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
-  const colors: Record<string, string> = {
-    blue: 'bg-blue-50 border-blue-200',
-    yellow: 'bg-yellow-50 border-yellow-200',
-    orange: 'bg-orange-50 border-orange-200',
-    green: 'bg-green-50 border-green-200',
-    gray: 'bg-gray-50 border-gray-200',
-    red: 'bg-red-50 border-red-200',
-  };
-
-  return (
-    <Card className={`p-4 text-center ${colors[color]}`}>
-      <div className="text-2xl font-bold text-gray-900">{value}</div>
-      <div className="text-sm text-gray-600 mt-1">{label}</div>
-    </Card>
-  );
-}
-
-function getStatusColor(status: string): string {
-  const colors: Record<string, string> = {
-    pending: 'bg-yellow-100 text-yellow-800',
-    preparing: 'bg-orange-100 text-orange-800',
-    ready: 'bg-green-100 text-green-800',
-    delivered: 'bg-gray-100 text-gray-800',
-    cancelled: 'bg-red-100 text-red-800',
-  };
-  return colors[status] || 'bg-gray-100 text-gray-800';
-}
-
-function QuickAction({ href, label, description }: { href: string; label: string; description: string }) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
-    >
-      <div>
-        <p className="font-medium text-gray-900">{label}</p>
-        <p className="text-sm text-gray-500">{description}</p>
-      </div>
-      <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-      </svg>
     </Link>
   );
 }
